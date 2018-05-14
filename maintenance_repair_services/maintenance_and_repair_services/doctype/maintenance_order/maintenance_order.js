@@ -32,12 +32,25 @@ frappe.ui.form.on('Maintenance Order', {
 frappe.ui.form.on("Maintenance Order Items", {
 	item_code: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
+			
+			frappe.call({
+				method: "frappe.client.get_value",
+				args: {
+					doctype: "Item Price",
+					fieldname: "price_list_rate",
+					filters: { item_code:row.item_code,
+						   selling:1  }
+				},
+				callback: function(r) {
+					if (r.message) {
+			console.log(r.message);
+			row.rate = r.message.price_list_rate;
 			row.net_rate = row.rate;
 			row.amount = flt(row.rate * row.qty);
 			refresh_field("net_rate", cdn, "product_for_maintenance");
 			refresh_field("amount", cdn, "product_for_maintenance");
-
-		
+			}
+		}});
 	},
 	amount: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
