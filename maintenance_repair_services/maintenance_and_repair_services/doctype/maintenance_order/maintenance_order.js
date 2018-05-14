@@ -43,10 +43,10 @@ frappe.ui.form.on("Maintenance Order Items", {
 				},
 				callback: function(r) {
 					if (r.message) {
-			console.log(r.message);
 			row.rate = r.message.price_list_rate;
 			row.net_rate = row.rate;
 			row.amount = flt(row.rate * row.qty);
+			refresh_field("rate", cdn, "product_for_maintenance");
 			refresh_field("net_rate", cdn, "product_for_maintenance");
 			refresh_field("amount", cdn, "product_for_maintenance");
 			}
