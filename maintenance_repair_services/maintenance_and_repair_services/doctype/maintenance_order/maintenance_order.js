@@ -32,6 +32,9 @@ frappe.ui.form.on('Maintenance Order', {
 frappe.ui.form.on("Maintenance Order Items", {
 	item_code: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
+			if (row.item_group=='Services') 
+				if (row.qty > 1)
+					frappe.msgprint(__("Service Item quantity could not be more than 1"))
 			
 			frappe.call({
 				method: "frappe.client.get_value",
