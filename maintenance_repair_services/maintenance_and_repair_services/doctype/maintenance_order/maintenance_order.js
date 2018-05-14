@@ -43,7 +43,10 @@ frappe.ui.form.on("Maintenance Order Items", {
 				},
 				callback: function(r) {
 					if (r.message) {
-			row.rate = r.message.price_list_rate;
+			if (row.qty < 1)
+			row.rate = r.message.price_list_rate * row.qty;
+			else if (row.qty >= 1) row.rate = r.message.price_list_rate;
+
 			row.net_rate = row.rate;
 			row.amount = flt(row.rate * row.qty);
 			refresh_field("rate", cdn, "product_for_maintenance");
@@ -51,6 +54,24 @@ frappe.ui.form.on("Maintenance Order Items", {
 			refresh_field("amount", cdn, "product_for_maintenance");
 			}
 		}});
+	},
+	qty: function(frm,cdt,cdn) {
+		var row = locals[cdt][cdn];
+			if (row.item_group=='Services') 
+				if (row.qty > 1)
+					frappe.msgprint(__("Service Item quantity could not be more than 1"))
+console.log(row.qty)
+			if (row.qty < 1)
+			row.rate = row.rate * row.qty;
+			else if (row.qty >= 1) row.rate = row.rate;
+
+			row.net_rate = row.rate;
+			row.amount = flt(row.rate * row.qty);
+			refresh_field("rate", cdn, "product_for_maintenance");
+			refresh_field("net_rate", cdn, "product_for_maintenance");
+			refresh_field("amount", cdn, "product_for_maintenance");
+
+		
 	},
 	amount: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
