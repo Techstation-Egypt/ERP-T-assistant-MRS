@@ -7,6 +7,9 @@ frappe.ui.form.on('Maintenance Order', {
 	refresh: function(frm) {
 
 	},
+	customer: function(frm) {
+		frm.set_value('item_code','');
+	},
 	onload: function(frm) {
 
 	if (frappe.user.has_role("Maintenance Manager"))
@@ -33,8 +36,10 @@ frappe.ui.form.on("Maintenance Order Items", {
 	item_code: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
 			if (row.item_group=='Services') 
-				if (row.qty > 1)
+				if (row.qty > 1){
 					frappe.msgprint(__("Service Item quantity could not be more than 1"))
+row.qty =1
+					}
 			
 			frappe.call({
 				method: "frappe.client.get_value",
@@ -52,6 +57,7 @@ frappe.ui.form.on("Maintenance Order Items", {
 
 			row.net_rate = row.rate;
 			row.amount = flt(row.rate * row.qty);
+			refresh_field("qty", cdn, "product_for_maintenance");
 			refresh_field("rate", cdn, "product_for_maintenance");
 			refresh_field("net_rate", cdn, "product_for_maintenance");
 			refresh_field("amount", cdn, "product_for_maintenance");
@@ -61,8 +67,10 @@ frappe.ui.form.on("Maintenance Order Items", {
 	qty: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
 			if (row.item_group=='Services') 
-				if (row.qty > 1)
+				if (row.qty > 1){
 					frappe.msgprint(__("Service Item quantity could not be more than 1"))
+row.qty =1
+					}
 console.log(row.qty)
 			if (row.qty < 1)
 			row.rate = row.rate * row.qty;
@@ -70,6 +78,7 @@ console.log(row.qty)
 
 			row.net_rate = row.rate;
 			row.amount = flt(row.rate * row.qty);
+			refresh_field("qty", cdn, "product_for_maintenance");
 			refresh_field("rate", cdn, "product_for_maintenance");
 			refresh_field("net_rate", cdn, "product_for_maintenance");
 			refresh_field("amount", cdn, "product_for_maintenance");
