@@ -7,10 +7,7 @@ import frappe
 def get_notification_config():
 	notifications =  { "for_doctype":
 		{		
-			"Maintenance Order": {
-				"status": ("not in", ("Completed", "Canceled")),
-				"docstatus": ("<", 2)
-			}
+			"Maintenance Order": "maintenance_repair_services.notifications.get_expiry_orders"
 		}
 	}
 
@@ -20,3 +17,25 @@ def get_notification_config():
 		notifications["for_doctype"][doc.name] = {"docstatus": 0}
 
 	return notifications
+
+
+def get_expiry_orders():
+	if frappe.db.get_value("Expiry Warning Settings", None, "hourly") == '1':
+		hourly = frappe.db.get_value("Expiry Warning Settings", None, "expiry_warning_durati")
+		if hourly:	
+			return frappe.db.sql("""\
+				SELECT count(*)
+				FROM `tabMaintenance Order`
+				WHERE status not in ('Completed', 'Canceled')
+				AND TIMESTAMPDIFF(HOUR, CURDATE(), end_date) <=%s
+				""",hourly)[0][0]
+
+	if frappe.db.get_value("Expiry Warning Settings", None, "dailly") == '1':
+		dailly = frappe.db.get_value("Expiry Warning Settings", None, "expiry_warning_durati2")
+		if dailly:	
+			return frappe.db.sql("""\
+				SELECT count(*)
+				FROM `tabMaintenance Order`
+				WHERE status not in ('Completed', 'Canceled')
+				AND DATEDIFF(CURDATE(),end_date) <=%s
+				""",dailly)[0][0]

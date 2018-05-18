@@ -5,12 +5,20 @@
 
 frappe.ui.form.on('Maintenance Order', {
 	refresh: function(frm) {
-
+		 frappe.meta.get_docfield("Maintenance Order Items","qty", cur_frm.doc.name).read_only = 0;
 	},
 	customer: function(frm) {
 		frm.set_value('item_code','');
 	},
 	onload: function(frm) {
+
+	frappe.db.get_value('Maintenance Section', null,'section_name', function(r) {
+			console.log(r)
+			if (!r)
+				frm.toggle_display("section", false); 
+			else
+				frm.toggle_display("section", true); 
+		});
 
 	if (frappe.user.has_role("Maintenance Manager"))
 		frm.toggle_display("products_details", true); 
@@ -28,17 +36,18 @@ frappe.ui.form.on('Maintenance Order', {
 
 	},
 
-      
-
-
 });
+
+
 frappe.ui.form.on("Maintenance Order Items", {
 	item_code: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
 			if (row.item_group=='Services') 
 				if (row.qty > 1){
-					frappe.msgprint(__("Service Item quantity could not be more than 1"))
-row.qty =1
+					//frappe.msgprint(__("Service Item quantity could not be more than 1"))
+					row.qty =1;
+					frm.toggle_display("qty", true)
+		 frappe.meta.get_docfield("Maintenance Order Items","qty", cur_frm.doc.name).read_only = 1;
 					}
 			
 			frappe.call({
@@ -68,10 +77,14 @@ row.qty =1
 		var row = locals[cdt][cdn];
 			if (row.item_group=='Services') 
 				if (row.qty > 1){
-					frappe.msgprint(__("Service Item quantity could not be more than 1"))
-row.qty =1
+					//frappe.msgprint(__("Service Item quantity could not be more than 1"))
+					row.qty =1;
+					refresh_field("qty", cdn, "product_for_maintenance");
+					frm.toggle_display("qty", true)
+		 frappe.meta.get_docfield("Maintenance Order Items","qty", cur_frm.doc.name).read_only = 1;
+					return false;
 					}
-console.log(row.qty)
+
 			if (row.qty < 1)
 			row.rate = row.rate * row.qty;
 			else if (row.qty >= 1) row.rate = row.rate;
